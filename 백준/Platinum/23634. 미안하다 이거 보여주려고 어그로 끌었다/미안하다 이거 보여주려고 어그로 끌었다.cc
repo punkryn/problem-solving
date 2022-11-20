@@ -1,207 +1,209 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
-#include <string>
-#include <cmath>
+#include <cstring>
 #include <set>
-#include <map>
-#include <stack>
 #include <queue>
-#include <vector>
-#include <algorithm>
-#define FIRST cin.tie(NULL); cout.tie(NULL); ios::sync_with_stdio(false);
-#define MAX 2001
 
+#define MAXN 2001
+#define MAXM 2001
+#define MAXGROUP 2000001
 
 using namespace std;
-int N, M;
-int Fire = 1; 
-int Region = 0;
-int MAP[MAX][MAX]; 
-int Fire_Number[MAX][MAX]; 
-bool visited[MAX][MAX]; 
-int Parent[MAX * MAX];
-queue<pair<int, int> > Q;
-queue<pair<int, int> > P;
-int moveY[4] = { -1,0,1,0 };
-int moveX[4] = { 0,-1,0,1 };
-int Year = 0;
 
-void init() {
-	for (int i = 1; i <= Fire; i++) {
-		Parent[i] = -1;
-	}
+int dx[4] = { -1, 0, 1, 0 };
+int dy[4] = { 0, 1, 0, -1 };
+
+int n, m, groupCnt, islandCnt, ansTime, ansCnt;
+int MAP[MAXN][MAXN];
+
+int v[MAXN][MAXM];
+int island[MAXN][MAXM];
+int parent[MAXGROUP];
+
+queue<pair<int, int>> q;
+queue<pair<int, int>> p;
+
+bool oob(int x, int y) {
+    return !(0 <= x && x < n && 0 <= y && y < m);
 }
 
-int Find_Group(int X) {
-	if (Parent[X] == -1) {
-		return X;
-	}
-	return Parent[X] = Find_Group(Parent[X]);
+int find_parent(int x) {
+    if (parent[x] == -1) {
+        return x;
+    }
+    return parent[x] = find_parent(parent[x]);
 }
 
-void Union_Group(int X, int Y) {
-	X = Find_Group(X);
-	Y = Find_Group(Y);
-	if (X != Y) {
-		Parent[X] = Y;
-	}
+void union_(int x, int y) {
+    x = find_parent(x);
+    y = find_parent(y);
+
+    if (x < y) {
+        parent[y] = x;
+    }
+    else {
+        parent[x] = y;
+    }
 }
 
-void Fire_Numbering(int Y, int X, int I) {
-	queue<pair<int, int> > T;
-	Fire_Number[Y][X] = I;
-	T.push(make_pair(Y, X));
-	Q.push(make_pair(Y, X));
+void bfs(int x, int y, int number) {
+    queue<pair<int, int>> queue;
+    queue.push(make_pair(x, y));
+    q.push(make_pair(x, y));
+    v[x][y] = number;
 
-	while (!T.empty()) {
-		int CurY = T.front().first;
-		int CurX = T.front().second;
-		T.pop();
+    while (!queue.empty()) {
+        auto top = queue.front();
+        queue.pop();
+        x = top.first;
+        y = top.second;
 
-		for (int i = 0; i < 4; i++) {
-			int nextY = CurY + moveY[i];
-			int nextX = CurX + moveX[i];
-			if ((nextY >= 0) && (nextY < N) && (nextX >= 0) && (nextX < M) && (MAP[nextY][nextX] == 0)) {
-				if (Fire_Number[nextY][nextX] == 0) {
-					Fire_Number[nextY][nextX] = I;
-					T.push(make_pair(nextY, nextX));
-					Q.push(make_pair(nextY, nextX));
-				}
-			}
-		}
-	};
+        for (int i = 0; i < 4; i++) {
+            int nx = x + dx[i];
+            int ny = y + dy[i];
+
+            if (oob(nx, ny))
+                continue;
+            if (v[nx][ny] || MAP[nx][ny] == 1 || MAP[nx][ny] == 2)
+                continue;
+            v[nx][ny] = number;
+            queue.push(make_pair(nx, ny));
+            q.push(make_pair(nx, ny));
+        }
+    }
 }
 
-void Region_Numbering(int Y, int X) {
-	queue<pair<int, int> > T;
-	visited[Y][X] = true;
-	T.push(make_pair(Y, X));
+void findIsland(int x, int y) {
+    queue<pair<int, int>> islandQ;
+    islandQ.push(make_pair(x, y));
+    island[x][y] = 1;
 
-	while (!T.empty()) {
-		int CurY = T.front().first;
-		int CurX = T.front().second;
-		T.pop();
+    while (!islandQ.empty()) {
+        int x, y;
+        auto top = islandQ.front();
+        islandQ.pop();
+        x = top.first;
+        y = top.second;
 
-		for (int i = 0; i < 4; i++) {
-			int nextY = CurY + moveY[i];
-			int nextX = CurX + moveX[i];
-			if ((nextY >= 0) && (nextY < N) && (nextX >= 0) && (nextX < M) && (MAP[nextY][nextX] != 2) && !visited[nextY][nextX]) {
-				visited[nextY][nextX] = true;
-				T.push(make_pair(nextY, nextX));
-			}
-		}
-	};
+        for (int k = 0; k < 4; k++) {
+            int nx = x + dx[k];
+            int ny = y + dy[k];
+            if (oob(nx, ny))
+                continue;
+            if (MAP[nx][ny] == 2 || island[nx][ny])
+                continue;
+
+            island[nx][ny] = 1;
+            islandQ.push(make_pair(nx, ny));
+        }
+    }
 }
 
-bool Fire_Parent() {
-	set<int> S;
-	for (int i = 1; i <= Fire; i++) {
-		S.insert(Find_Group(i));
-	}
-	if (S.size() == Region) {
-		return true;
-	}
-	return false;
+bool isConnected() {
+    set<int> cand;
+    for (int i = 1; i <= groupCnt; i++) {
+        cand.insert(find_parent(i));
+    }
+    return cand.size() == islandCnt;
 }
 
-bool BFS() {
-	while (!Q.empty()) {
-		int CurY = Q.front().first;
-		int CurX = Q.front().second;
-		Q.pop();
+bool solution() {
+    while (!q.empty()) {
+        int x = q.front().first;
+        int y = q.front().second;
+        q.pop();
 
-		P.push(make_pair(CurY, CurX));
+        p.push(make_pair(x, y));
 
-		for (int i = 0; i < 4; i++) {
-			int nextY = CurY + moveY[i];
-			int nextX = CurX + moveX[i];
-			if ((nextY >= 0) && (nextY < N) && (nextX >= 0) && (nextX < M) &&
-				(Fire_Number[nextY][nextX] > 0) && (Fire_Number[nextY][nextX] != Fire_Number[CurY][CurX])) {
-				int CurF = Fire_Number[CurY][CurX];
-				int nextF = Fire_Number[nextY][nextX];
-				if (Find_Group(CurF) != Find_Group(nextF)) {
-					Union_Group(CurF, nextF);
-				}
-			}
-		}
-	};
+        for (int i = 0; i < 4; i++) {
+            int nx = x + dx[i];
+            int ny = y + dy[i];
 
-	if (Fire_Parent()) {
-		return false;
-	}
+            if (oob(nx, ny))
+                continue;
+            if (!v[nx][ny] || v[nx][ny] == v[x][y]) continue;
+            int cur = v[x][y];
+            int nxt = v[nx][ny];
+            if (find_parent(cur) == find_parent(nxt)) continue;
+            union_(cur, nxt);
+        }
+    }
 
-	while (!P.empty()) {
-		int CurY = P.front().first;
-		int CurX = P.front().second;
-		P.pop();
+    if (isConnected()) return false;
 
-		for (int i = 0; i < 4; i++) {
-			int nextY = CurY + moveY[i];
-			int nextX = CurX + moveX[i];
-			if ((nextY >= 0) && (nextY < N) && (nextX >= 0) && (nextX < M) && (MAP[nextY][nextX] == 1) && (Fire_Number[nextY][nextX] == 0)) {
-				Fire_Number[nextY][nextX] = Fire_Number[CurY][CurX];
-				Q.push(make_pair(nextY, nextX));
-			}
-		}
-	};
+    while (!p.empty()) {
+        int x = p.front().first;
+        int y = p.front().second;
+        p.pop();
 
-	return true;
-}
+        for (int i = 0; i < 4; i++) {
+            int nx = x + dx[i];
+            int ny = y + dy[i];
 
-int Fire_Count() {
-	int res = 0;
-	for (int i = 0; i < N; i++) {
-		for (int j = 0; j < M; j++) {
-			if (Fire_Number[i][j] > 0) {
-				res++;
-			}
-		}
-	}
-	return res;
+            if (oob(nx, ny)) continue;
+            if (MAP[nx][ny] == 1 && !v[nx][ny]) {
+                v[nx][ny] = v[x][y];
+                q.push(make_pair(nx, ny));
+            }
+        }
+    }
+    return true;
 }
 
 int main() {
-	FIRST
-	cin >> N >> M;
-	for (int i = 0; i < N; i++) {
-		string S;
-		cin >> S;
-		for (int j = 0; j < M; j++) {
-			MAP[i][j] = (S[j] - '0');
-		}
-	}
-	for (int i = 0; i < N; i++) {
-		for (int j = 0; j < M; j++) {
-			if ((MAP[i][j] == 0) && (Fire_Number[i][j] == 0)) {
-				Fire_Numbering(i, j, Fire++);
-			}
-		}
-	}
-	Fire--;
-	init();
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+    cout.tie(0);
 
-	for (int i = 0; i < N; i++) {
-		for (int j = 0; j < M; j++) {
-			if ((MAP[i][j] == 0) && (!visited[i][j])) {
-				Region_Numbering(i, j);
-				Region++;
-			}
-		}
-	}
+    cin >> n >> m;
+    for (int i = 0; i < n; i++) {
+        string tmp;
+        cin >> tmp;
+        for (int j = 0; j < m; j++) {
+            MAP[i][j] = tmp[j] - '0';
+        }
+    }
 
-	if (Fire == 0) {
-		cout << 0 << " " << 0 << "\n";
-	}
-	else {
-		while (1) {
-			bool Flag = BFS();
-			if (!Flag) {
-				break;
-			}
-			Year++;
-		};
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < m; j++) {
+            if (v[i][j]) continue;
+            if (MAP[i][j] == 1 || MAP[i][j] == 2) continue;
 
-		cout << Year << " " << Fire_Count() << "\n";
-	}
+            groupCnt++;
+            bfs(i, j, groupCnt);
+        }
+    }
 
-	return 0;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < m; j++) {
+            if (MAP[i][j] != 0 || island[i][j])
+                continue;
+            islandCnt++;
+            findIsland(i, j);
+        }
+    }
+
+    for (int i = 0; i <= groupCnt; i++) {
+        parent[i] = -1;
+    }
+
+    if (!groupCnt) {
+        cout << 0 << ' ' << 0;
+        return 0;
+    }
+
+    while (true) {
+        if (!solution()) break;
+        ansTime++;
+    }
+
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < m; j++) {
+            if(v[i][j] > 0)
+                ansCnt += 1;
+        }
+    }
+
+    cout << ansTime << ' ' << ansCnt;
+    return 0;
 }

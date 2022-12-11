@@ -1,3 +1,25 @@
+# 5 4
+# 1 2 0.1
+# 1 3 0.2
+# 3 4 0.3
+# 3 5 0.7
+# 10
+# 0.9
+# 0.8
+# 0.7
+# 0.6
+# 0.5
+# 0.4
+# 0.3
+# 0.2
+# 0.1
+# 0
+
+# 1 1
+# 1 1 0.1
+# 1
+# 0
+
 # https://www.acmicpc.net/problem/26155
 import sys
 si = sys.stdin.readline
@@ -51,7 +73,6 @@ if __name__ == '__main__':
 
             idx += 1
         
-        if len(query[i]) != 2 or query[i][1] >= q: break
         ans[query[i][1]] = cnt
     
     for i in range(len(ans)):

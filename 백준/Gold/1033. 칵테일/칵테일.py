@@ -1,6 +1,5 @@
 # https://www.acmicpc.net/problem/1033
 import sys
-from collections import deque
 from math import gcd
 # sys.setrecursionlimit(int(1e9))
 si = sys.stdin.readline

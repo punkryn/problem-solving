@@ -12,14 +12,11 @@ if __name__ == '__main__':
     roads = list(mis())
     city = list(mis())
 
-    st = []
+    st = INF
     ans = 0
     for i in range(n - 1):
-        if not st:
-            st.append(city[i])
-        else:
-            if st[-1] > city[i]:
-                st.append(city[i])
+        if st > city[i]:
+            st = city[i]
         
-        ans += st[-1] * roads[i]
+        ans += st * roads[i]
     print(ans)

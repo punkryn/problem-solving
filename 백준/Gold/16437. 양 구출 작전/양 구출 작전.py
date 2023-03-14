@@ -1,6 +1,6 @@
 # https://www.acmicpc.net/problem/16437
 import sys
-sys.setrecursionlimit(int(1e6))
+sys.setrecursionlimit(int(1e5))
 si = sys.stdin.readline
 mis = lambda: map(int, si().split())
 INF = float('inf')

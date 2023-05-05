@@ -5,9 +5,12 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strconv"
 )
-var reader = bufio.NewReader(os.Stdin)
+
+// var reader = bufio.NewReader(os.Stdin)
 var writer = bufio.NewWriter(os.Stdout)
+var scanner = bufio.NewScanner(os.Stdin)
 var dx = [4]int{-1, 0, 1, 0}
 var dy = [4]int{0, 1, 0, -1}
 
@@ -18,9 +21,11 @@ var (
 )
 func main() {
 	defer writer.Flush()
+	scanner.Split(bufio.ScanWords)
 
 	for {
-		fmt.Fscan(reader, &n, &m)
+		n = scanInt()
+		m = scanInt()
 		if n == 0 && m == 0 {
 			return
 		}
@@ -34,7 +39,7 @@ func main() {
 
 		for i := 1; i <= n; i++ {
 			for j := 1; j <= m; j++ {
-				fmt.Fscan(reader, &matrix[i][j])
+				matrix[i][j] = scanInt()
 			}
 		}
 
@@ -76,4 +81,10 @@ func sum[it IntType](x ...it) it {
 		ret += v
 	}
 	return ret
+}
+
+func scanInt() int {
+	scanner.Scan()
+	n, _ := strconv.Atoi(scanner.Text())
+	return n
 }

@@ -25,4 +25,10 @@ class Solution:
         
         nums[idx], nums[idx2] = nums[idx2], nums[idx]
         
-        nums[idx + 1:] = sorted(nums[idx + 1:])
+        self.sort(nums, idx + 1, len(nums))
+        
+    def sort(self, arr, s, e):
+        for i in range(s, e - 1):
+            for j in range(i + 1, e):
+                if arr[i] > arr[j]:
+                    arr[i], arr[j] = arr[j], arr[i]

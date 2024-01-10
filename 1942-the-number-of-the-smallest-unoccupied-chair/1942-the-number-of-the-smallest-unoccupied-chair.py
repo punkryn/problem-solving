@@ -21,10 +21,10 @@ class Solution:
                 maxChair += 1
                 
             curChair = heapq.heappop(chairQueue)
-            ans = curChair
             heapq.heappush(leaving, (le, curChair))
 
             if idx == targetFriend:
+                ans = curChair
                 break
 
         return ans

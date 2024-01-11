@@ -9,27 +9,22 @@ class Solution:
 
         n = len(nums)
         nums.sort()
-        v = [False] * n
-        def go(depth, cur, idx):
-            if depth == k:
-                if False in v:
-                    return False
-                return True
-
-            if cur == p:
-                return go(depth + 1, 0, 0)
-
-            ret = False
-            for i in range(idx, n):
-                if v[i]: continue
-                nxt = cur + nums[i]
-                if nxt > p: break
-                
-                v[i] = True
-                ret |= go(depth, nxt, i + 1)
-                if ret: return ret
-                v[i] = False
-
-            return ret
         
-        return go(0, 0, 0)
+        dp = [False] * (1 << n)
+        dp[0] = True
+        total = [0] * (1 << n)
+
+        for i in range(1 << n):
+            if not dp[i]: continue
+            for j in range(n):
+                nxt = i | (1 << j)
+
+                if nxt == i: continue
+
+                if total[i] % p + nums[j] > p:
+                    break
+                
+                dp[nxt] = True
+                total[nxt] = total[i] + nums[j]
+        
+        return dp[(1 << n) - 1]

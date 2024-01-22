@@ -60,46 +60,10 @@ class Solution {
             }
         }
         
-        for (var start : list.get(created_v)) {
-            if (v[start] != 0) {
-                continue;
-            }
-            boolean donut = bfs(start);
-            if (donut) {
-                answer[1]++;
-            }
-        }
-        
         answer[0] = created_v;
+        answer[1] = list.get(created_v).size() - bar - belt;
         answer[2] = bar;
         answer[3] = belt;
         return answer;
-    }
-    
-    private boolean bfs(int start) {
-        v[start] = 1;
-        Queue<Integer> q = new LinkedList<>();
-        q.add(start);
-        
-        while (!q.isEmpty()) {
-            int cur = q.poll();
-            if (list.get(cur).size() == 2) {
-                return false;
-            }
-            
-            for (var nxt : list.get(cur)) {
-                if (v[nxt] == 2 || v[nxt] == 3) {
-                    return false;
-                }
-                
-                if (v[nxt] != 0) {
-                    continue;
-                }
-                
-                v[nxt] = 1;
-                q.add(nxt);
-            }
-        }
-        return true;
     }
 }

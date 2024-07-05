@@ -1,9 +1,11 @@
-SELECT CATEGORY, PRICE, PRODUCT_NAME
-FROM (
-        SELECT CATEGORY, PRICE, PRODUCT_NAME,
-                RANK() OVER (PARTITION BY CATEGORY ORDER BY PRICE DESC) AS ranking
-        FROM FOOD_PRODUCT
-        WHERE CATEGORY IN ('과자', '국', '김치', '식용유')
-    ) AS aa
-WHERE ranking = 1
-ORDER BY 2 DESC;
+select f.category, f.price, f.product_name
+from food_product f
+join (
+    select category, max(price) price
+    from food_product
+    where category in ('과자', '국', '김치', '식용유')
+    group by category
+) fp on f.category = fp.category
+where f.price = fp.price
+order by f.price desc;
+

@@ -13,11 +13,11 @@ SELECT
     floor((
         case
             when datediff(joined.end_date, joined.start_date) + 1 >= 90
-                then (100 - CAST(REPLACE(plan90.discount_rate, '%', '') AS DECIMAL(5,2))) / 100
+                then (100 - plan90.discount_rate) / 100
             when datediff(joined.end_date, joined.start_date) + 1 >= 30
-                then (100 - CAST(REPLACE(plan30.discount_rate, '%', '') AS DECIMAL(5,2))) / 100
+                then (100 - plan30.discount_rate) / 100
             when datediff(joined.end_date, joined.start_date) + 1 >= 7
-                then (100 - CAST(REPLACE(plan7.discount_rate, '%', '') AS DECIMAL(5,2))) / 100
+                then (100 - plan7.discount_rate) / 100
             else
                 1
         end

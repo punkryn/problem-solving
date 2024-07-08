@@ -5,4 +5,4 @@ select
     concat(round(avg(d_between_dist), 2), 'km') AVERAGE_DISTANCE
 from subway_distance s
 group by 1
-order by 1 desc;
+order by sum(d_between_dist) desc;

@@ -5,12 +5,11 @@ select
     length
 from fish_info fi, fish_name_info fni
 where fi.fish_type = fni.fish_type
-and (fish_name, length) in (
+and (fi.fish_type, length) in (
     select
-        fish_name,
+        fish_type,
         max(length) ml
-    from fish_info fi, fish_name_info fni
-    where fi.fish_type = fni.fish_type
-    group by fish_name
+    from fish_info fi
+    group by fish_type
 )
 order by id asc;
